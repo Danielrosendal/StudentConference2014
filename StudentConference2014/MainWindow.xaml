@@ -1,0 +1,175 @@
+﻿<Window x:Class="StudentConference2014.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow"
+        xmlns:studentConference2014="clr-namespace:StudentConference2014"
+        xmlns:themes="clr-namespace:StudentConference2014.Themes"
+        xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+        Width="1000"
+        Height="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <!--<ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PresentationFramework.Classic;component/themes/classic.xaml" />
+            </ResourceDictionary.MergedDictionaries>-->
+            <studentConference2014:QuestionDataTemplateSelector x:Key="QuestionDataTemplateSelector" />
+            <Style x:Key="QuestionContainerStyle"
+                   TargetType="Grid">
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+                <Setter Property="VerticalAlignment"
+                        Value="Center" />
+            </Style>
+
+            <DataTemplate x:Key="c_questionnaireIntro">
+                <Grid>
+                    <Grid Style="{DynamicResource QuestionContainerStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Hej, Vänligen fyll i ditt namn i rutan nedan"
+                                   Style="{DynamicResource QuestionTextStyle}" />
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding ParticipantName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{DynamicResource TextBoxStyle}" />
+                        <Button Grid.Row="2"
+                                Command="FirstPage"
+                                Content="StartQuestionnaire" 
+                                Margin="5"
+                                Height="25"
+                                Style="{DynamicResource QuestionButtonStyle}"/>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="c_multiAnswerQuestion">
+                <Grid>
+                    <Grid Style="{DynamicResource QuestionContainerStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Path=Text}"
+                                   Style="{DynamicResource QuestionTextStyle}" />
+                        <ItemsControl Grid.Row="1"
+                                      ItemsSource="{Binding Alternatives}"
+                                      HorizontalAlignment="Center"
+                                      Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton GroupName="QuestionRadioButtonGroup"
+                                                     IsChecked="{Binding IsChecked}"
+                                                     Content="{Binding Text}"
+                                                     Style="{DynamicResource RadioButtonStyle}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="c_freeTextQuestion">
+                <Grid>
+                    <Grid Style="{DynamicResource QuestionContainerStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Path=Text}"
+                                   Style="{DynamicResource QuestionTextStyle}" />
+                        <TextBox Grid.Row="1"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding FreeTextAnswer}"
+                                 Style="{DynamicResource TextBoxStyle}" />
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="c_questionnaireDone">
+                <Grid>
+                    <Grid Style="{DynamicResource QuestionContainerStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Congratiolations you have completed the questionnaire"
+                                   Style="{DynamicResource QuestionTextStyle}" />
+                        <Button Grid.Row="1"
+                                Content="Save Result"
+                                Command="Save"
+                                Height="25"
+                                Style="{DynamicResource QuestionButtonStyle}" />
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="BrowseBack"
+                        Executed="BackwardsCommand_OnExecuted"
+                        CanExecute="BackwardsCommand_OnCanExecute" />
+        <CommandBinding Command="BrowseForward"
+                        Executed="ForwardCommand_OnExecuted"
+                        CanExecute="ForwardCommand_OnCanExecute" />
+        <CommandBinding Command="Save"
+                        Executed="SaveCommand_Executed"
+                        CanExecute="SaveCommand_OnCanExecute" />
+        <CommandBinding Command="FirstPage"
+                        Executed="StartQuestionnaire_Executed"
+                        CanExecute="StartQuestionnaire_CanExecute" />
+    </Window.CommandBindings>
+    <Grid x:Name="rootContainer"
+          Style="{DynamicResource RootContainerStyle}"
+          themes:MkThemeSelector.CurrentThemeDictionary="{Binding ElementName=cmbThemes, Path=SelectedItem.Tag}">
+        <Grid Margin="50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ComboBox Grid.ColumnSpan="3"
+                      x:Name="cmbThemes"
+                      Margin="4"
+                      Width="150"
+                      SelectedIndex="0">
+                <ComboBoxItem Content="Beautiful"
+                              Tag="/StudentConference2014;component/Themes/BeautifulStyles.xaml" />
+                <ComboBoxItem Content="None"
+                              Tag="/StudentConference2014;component/Themes/UglyStyles.xaml" />
+                <ComboBoxItem Content="Shiny Blue"
+                              Tag="/StudentConference2014;component/Themes/ShinyBlue.xaml" />
+                <ComboBoxItem Content="Shiny Red"
+                              Tag="/StudentConference2014;component/Themes/ShinyRed.xaml" />
+            </ComboBox>
+            <Button Grid.Row="1"
+                    Grid.Column="0"
+                    Content="Förra Frågan"
+                    Command="BrowseBack"
+                    Style="{DynamicResource QuestionButtonStyle}"
+                    IsEnabled="{Binding QuestionnaireStarted}"/>
+            <TabControl Grid.Row="1"
+                        Grid.Column="1"
+                        ItemsSource="{Binding Questions}"
+                        SelectedItem="{Binding SelectedQuestion}"
+                        ContentTemplateSelector="{StaticResource QuestionDataTemplateSelector}"
+                        HorizontalAlignment="Stretch"
+                        Style="{DynamicResource QuestionnaireContainerStyle}"
+                        ItemContainerStyle="{DynamicResource TabItemStyle}" />
+            <Button Grid.Row="1"
+                    Grid.Column="2"
+                    Content="Nästa Fråga"
+                    Command="BrowseForward"
+                    Style="{DynamicResource QuestionButtonStyle}"
+                    IsEnabled="{Binding QuestionnaireStarted}" />
+        </Grid>
+    </Grid>
+</Window>
